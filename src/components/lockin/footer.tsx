@@ -1,0 +1,93 @@
+"use client";
+
+import * as React from "react";
+import { LockMark } from "./primitives";
+import { useLockinStore } from "@/lib/store";
+
+export function Footer() {
+  const setView = useLockinStore((s) => s.setView);
+
+  return (
+    <footer className="mt-auto border-t border-white/[0.06] bg-black">
+      <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-white">
+              <LockMark className="h-5 w-5" />
+              <span className="text-[15px] font-semibold tracking-[0.18em]">
+                LOCKIN
+              </span>
+            </div>
+            <p className="max-w-xs text-sm leading-relaxed text-white/45">
+              Remove distractions. Build momentum. The focus operating system for
+              ambitious people.
+            </p>
+          </div>
+
+          <FooterCol
+            title="Product"
+            links={[
+              { label: "Overview", onClick: () => setView("landing") },
+              { label: "Dashboard", onClick: () => setView("dashboard") },
+              { label: "Active Session", onClick: () => setView("session") },
+              { label: "Chrome Extension", onClick: () => setView("extension") },
+            ]}
+          />
+          <FooterCol
+            title="Experience"
+            links={[
+              { label: "Blocked Page Demo", onClick: () => setView("blocked") },
+              { label: "Focus Modes", onClick: () => setView("landing") },
+              { label: "Analytics", onClick: () => setView("dashboard") },
+              { label: "Anti-Cheat", onClick: () => setView("landing") },
+            ]}
+          />
+          <FooterCol
+            title="Company"
+            links={[
+              { label: "About", onClick: () => setView("landing") },
+              { label: "Manifesto", onClick: () => setView("landing") },
+              { label: "Privacy", onClick: () => setView("landing") },
+              { label: "Contact", onClick: () => setView("landing") },
+            ]}
+          />
+        </div>
+
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center">
+          <p className="text-xs text-white/35">
+            © {new Date().getFullYear()} LOCKIN. Designed in black & white.
+          </p>
+          <p className="text-xs text-white/35">
+            Focus is your unfair advantage.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; onClick: () => void }[];
+}) {
+  return (
+    <div>
+      <h4 className="text-eyebrow text-white/35">{title}</h4>
+      <ul className="mt-4 space-y-2.5">
+        {links.map((l) => (
+          <li key={l.label}>
+            <button
+              onClick={l.onClick}
+              className="text-sm text-white/55 transition-colors hover:text-white"
+            >
+              {l.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
