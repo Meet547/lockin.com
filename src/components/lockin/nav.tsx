@@ -87,10 +87,10 @@ export function NavBar() {
 
         <div className="hidden md:block">
           <button
-            onClick={() => goToLandingSection("download")}
+            onClick={() => goToLandingSection("onboarding")}
             className="rounded-full bg-white px-4 py-1.5 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95"
           >
-            Download
+            Get Extension
           </button>
         </div>
 
@@ -131,12 +131,12 @@ export function NavBar() {
               ))}
               <button
                 onClick={() => {
-                  goToLandingSection("download");
+                  goToLandingSection("onboarding");
                   setOpen(false);
                 }}
                 className="mt-1 block w-full rounded-xl bg-white px-4 py-3 text-center text-[15px] font-semibold text-black"
               >
-                Download Extension
+                Get Extension
               </button>
             </div>
           </motion.div>

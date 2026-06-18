@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +10,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// A single user (demo: one local user "Alex Kim"). Multi-user ready.
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  sessions    Session[]
+  blockedSites BlockedSite[]
 }
 
-model Post {
+// A focus session. status: active | completed | cancelled
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  mode        String   // easy | hard | monk
+  durationMin Int      // planned duration in minutes
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  status      String   @default("active")
+  blockedCount Int     @default(0) // attempts blocked during this session
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([userId, startedAt])
+}
+
+// A site in the user's block list.
+model BlockedSite {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  userId    String
+  host      String   // e.g. youtube.com
+  hits      Int      @default(0) // total blocked attempts
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, host])
+  @@index([userId])
 }

@@ -7,6 +7,7 @@ import { ProblemSection } from "./problem";
 import { HowItWorks } from "./how-it-works";
 import { FeatureShowcase } from "./features";
 import { FocusModes } from "./focus-modes";
+import { Onboarding } from "./onboarding";
 import { SocialProof } from "./social-proof";
 import { FAQ } from "./faq";
 import { FinalCTA } from "./final-cta";
@@ -34,6 +35,7 @@ export function Landing() {
       <HowItWorks />
       <FeatureShowcase />
       <FocusModes />
+      <Onboarding />
       <SocialProof />
       <FAQ />
       <FinalCTA />
