@@ -121,3 +121,39 @@ Work Log:
 
 Stage Summary:
 - Hero is polished: max-contrast headline, whisper-subtle grid, layered scroll parallax, premium spacing/typography, zero bugs.
+
+---
+Task ID: 15-e2e-audit
+Agent: main (orchestrator)
+Task: Full end-to-end audit — fix all reverted code, security, bugs, polish
+
+Work Log:
+- CRITICAL: Found the extension had reverted to v1.0.0 (broken query-string blocking, no webNavigation, no content-blocker). Rebuilt all 4 blocking layers: background.js (DNR requestDomains + webNavigation.onBeforeNavigate + tabs.onUpdated), content-blocker.js (Layer 4, runs in page at document_start), manifest v1.3.0 with webNavigation+scripting perms + content_scripts. Re-zipped.
+- CRITICAL: demo-user.ts had reverted to seeding 5 fake sites + 11 fake sessions. Rewrote — NO seeding. Verified fresh DB returns 0/0/0/0/None.
+- CRITICAL: landing/index.tsx had reverted to 9 sections (Problem/Features/SocialProof/FAQ restored). Rewrote to clean 6: Hero → Quotes → HowItWorks → FocusModes → Onboarding → FinalCTA. Recreated quotes.tsx (was deleted).
+- CRITICAL: nav.tsx had reverted to 5 items (Overview/Active Session/Blocked Page). Fixed to 3: Dashboard → Session → Extension.
+- CRITICAL: footer.tsx had reverted to 4 columns. Fixed to 3 columns (Product/Get Started + brand).
+- SECURITY: blocklist POST had no host validation — could accept <script> tags (XSS risk). Added isValidHost() requiring [a-z0-9.-], max 253 chars, ≥2 labels. Tested: XSS rejected, "localhost" rejected, "youtube.com" accepted, scheme/path stripped.
+- SECURITY: sessions POST had no mode/duration validation. Added VALID_MODES enum (easy/hard/monk), duration bounds (1-480 min). Invalid inputs fall back to monk/90.
+- SECURITY: sessions/[id] PATCH didn't verify session ownership. Added userId check. Cross-user access returns 404.
+- SECURITY: sessions/[id] PATCH blocked-site hits query was global, not user-scoped. Added where: { userId }.
+- Removed dead rules.json from extension.
+- Verified hero refinements intact: dim "Focus is your" (white/20), bold "unfair advantage", spotlight grid (0.022), word stagger, scroll parallax.
+
+End-to-end test results:
+- Fresh DB: streak 0, today 0m, sites 0, sessions 0, active None ✓
+- XSS host → rejected ✓ | invalid host → rejected ✓ | host normalization ✓
+- Invalid mode → fallback monk ✓ | negative/huge duration → fallback 90 ✓
+- Session complete → blockedCount 585 ✓ | cross-user PATCH → 404 ✓
+- All 5 views render: Dashboard "Focus Overview", Session "No active session"/"Stay with it.", Extension "One click from focus." ✓
+- No sidebar (0 aside elements) ✓
+- Dashboard lifecycle: add sites → start → 01:29:57 countdown → complete → 1h30m today, 1d streak ✓
+- Mobile responsive, no overflow, full-width buttons ✓
+- Mobile drawer works with all nav items ✓
+- Sticky footer correct ✓
+- No console errors/warnings across all views ✓
+- Extension zip v1.3.0 with 4 blocking layers, webNavigation perm, content_scripts, 8 files ✓
+- Lint clean ✓
+
+Stage Summary:
+- All reverted code fixed and locked in. Security hardened (host validation, mode/duration validation, ownership checks). Extension rebuilt with 4-layer blocking. Site is clean, minimal, fully functional, no bugs.

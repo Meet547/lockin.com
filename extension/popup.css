@@ -54,6 +54,12 @@ html, body {
   font-weight: 600;
   letter-spacing: 0.16em;
 }
+.version {
+  font-family: "SF Mono", ui-monospace, monospace;
+  font-size: 9px;
+  color: var(--muted);
+  margin-left: 2px;
+}
 .pill {
   font-size: 10px;
   font-weight: 500;
@@ -328,6 +334,15 @@ html, body {
   background: rgba(255,255,255,0.1);
   color: var(--muted);
   cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--secondary);
+  border: 1px solid var(--hairline-strong);
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.05);
   transform: none;
 }
 

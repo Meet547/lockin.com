@@ -4,6 +4,10 @@ import { getOrCreateDemoUser } from "@/lib/demo-user";
 
 export const dynamic = "force-dynamic";
 
+const VALID_MODES = ["easy", "hard", "monk"] as const;
+const MIN_DURATION = 1;
+const MAX_DURATION = 480; // 8 hours cap
+
 // GET /api/sessions — list sessions for the demo user
 export async function GET() {
   const user = await getOrCreateDemoUser();
@@ -19,8 +23,17 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await getOrCreateDemoUser();
   const body = await req.json().catch(() => ({}));
-  const mode = (body.mode as string) || "monk";
-  const durationMin = Number(body.durationMin) || 90;
+
+  const mode =
+    typeof body.mode === "string" && VALID_MODES.includes(body.mode as (typeof VALID_MODES)[number])
+      ? body.mode
+      : "monk";
+
+  const rawDur = Number(body.durationMin);
+  const durationMin =
+    Number.isFinite(rawDur) && rawDur >= MIN_DURATION && rawDur <= MAX_DURATION
+      ? Math.floor(rawDur)
+      : 90;
 
   // End any currently-active session first (one at a time)
   await db.session.updateMany({

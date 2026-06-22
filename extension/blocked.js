@@ -1,4 +1,4 @@
-// LOCKIN blocked page — reads active session + shows live countdown + quote.
+// LOCKIN blocked page — shows which site was blocked + live countdown.
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -16,14 +16,13 @@ function fmt(seconds) {
   return `${p(h)}:${p(m)}:${p(s)}`;
 }
 
-// Parse the blocked host from ?site=
-const params = new URLSearchParams(location.search);
-const site = params.get("site") || "this site";
-$("#site-name").textContent = site;
-
 async function init() {
+  const { "lockin.lastBlocked": lastBlocked } = await chrome.storage.session.get("lockin.lastBlocked");
+  $("#site-name").textContent = lastBlocked || "this site";
+
   const state = await send("GET_STATE");
   const session = state.session;
+
   const quoteRes = await send("GET_QUOTE");
   if (quoteRes?.quote) {
     $("#quote").textContent = `"${quoteRes.quote.q}"`;
@@ -31,7 +30,6 @@ async function init() {
   }
 
   if (!session) {
-    // No active session — shouldn't happen, but handle gracefully
     $("#countdown").textContent = "—";
     $("#mode-name").textContent = "Locked";
     return;
@@ -47,17 +45,12 @@ async function init() {
     const elapsed = total - remaining;
     const pct = total > 0 ? (elapsed / total) * 100 : 0;
     $("#progress-bar").style.width = pct + "%";
-    if (remaining <= 0) {
-      // session ended — allow navigation back
-      $("#countdown").textContent = "00:00:00";
-    }
   };
   tick();
   setInterval(tick, 1000);
 }
 
 $("#back-btn").addEventListener("click", () => {
-  // try to go back; fallback to a blank tab
   if (history.length > 1) history.back();
   else chrome.tabs.update({ url: "chrome://newtab" });
 });

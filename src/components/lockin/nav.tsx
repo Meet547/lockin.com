@@ -8,10 +8,8 @@ import { useLockinStore, type ViewId } from "@/lib/store";
 import { Wordmark } from "./primitives";
 
 const NAV_ITEMS: { label: string; view: ViewId }[] = [
-  { label: "Overview", view: "landing" },
   { label: "Dashboard", view: "dashboard" },
-  { label: "Active Session", view: "session" },
-  { label: "Blocked Page", view: "blocked" },
+  { label: "Session", view: "session" },
   { label: "Extension", view: "extension" },
 ];
 

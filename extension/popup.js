@@ -50,12 +50,14 @@ function renderChips() {
 function setActiveUI(session) {
   const card = $("#active-card");
   const startBtn = $("#start-btn");
+  const testBtn = $("#test-btn");
   const pill = $("#status-pill");
   const fields = document.querySelectorAll(".field");
 
   if (session) {
     card.classList.remove("hidden");
     startBtn.classList.add("hidden");
+    testBtn.classList.remove("hidden");
     pill.className = "pill pill-active";
     pill.textContent = "Active";
     fields.forEach((f) => {
@@ -66,6 +68,7 @@ function setActiveUI(session) {
   } else {
     card.classList.add("hidden");
     startBtn.classList.remove("hidden");
+    testBtn.classList.add("hidden");
     pill.className = "pill pill-idle";
     pill.textContent = "Idle";
     fields.forEach((f) => {
@@ -146,6 +149,12 @@ $("#end-btn").addEventListener("click", async () => {
   await send("END_SESSION");
   activeSession = null;
   setActiveUI(null);
+});
+
+$("#test-btn").addEventListener("click", async () => {
+  const testHost = blocklist[0] || "youtube.com";
+  await send("TEST_BLOCK", { url: `https://${testHost}` });
+  window.close();
 });
 
 // ---- init ----

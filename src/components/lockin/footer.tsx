@@ -5,12 +5,12 @@ import { LockMark } from "./primitives";
 import { useLockinStore } from "@/lib/store";
 
 export function Footer() {
-  const setView = useLockinStore((s) => s.setView);
+  const { setView, goToLandingSection } = useLockinStore();
 
   return (
     <footer className="mt-auto border-t border-white/[0.06] bg-black">
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-white">
               <LockMark className="h-5 w-5" />
@@ -19,36 +19,24 @@ export function Footer() {
               </span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-white/45">
-              Remove distractions. Build momentum. The focus operating system for
-              ambitious people.
+              Remove distractions. Build momentum.
             </p>
           </div>
 
           <FooterCol
             title="Product"
             links={[
-              { label: "Overview", onClick: () => setView("landing") },
               { label: "Dashboard", onClick: () => setView("dashboard") },
               { label: "Active Session", onClick: () => setView("session") },
-              { label: "Chrome Extension", onClick: () => setView("extension") },
+              { label: "Extension", onClick: () => setView("extension") },
             ]}
           />
           <FooterCol
-            title="Experience"
+            title="Get Started"
             links={[
-              { label: "Blocked Page Demo", onClick: () => setView("blocked") },
+              { label: "Download", onClick: () => goToLandingSection("onboarding") },
               { label: "Focus Modes", onClick: () => setView("landing") },
-              { label: "Analytics", onClick: () => setView("dashboard") },
-              { label: "Anti-Cheat", onClick: () => setView("landing") },
-            ]}
-          />
-          <FooterCol
-            title="Company"
-            links={[
-              { label: "About", onClick: () => setView("landing") },
-              { label: "Manifesto", onClick: () => setView("landing") },
-              { label: "Privacy", onClick: () => setView("landing") },
-              { label: "Contact", onClick: () => setView("landing") },
+              { label: "Overview", onClick: () => setView("landing") },
             ]}
           />
         </div>
