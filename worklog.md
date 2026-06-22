@@ -104,3 +104,20 @@ Work Log:
 
 Stage Summary:
 - Dashboard sidebar permanently removed. Clean minimal single-column overview.
+
+---
+Task ID: 14-hero-refine
+Agent: main (orchestrator)
+Task: Refine hero — stronger headline contrast (blacken "Focus is your", whiten "unfair advantage"), subtler grid, better scroll/typography/spacing, no bugs
+
+Work Log:
+- The hero had reverted to an old simple version (no word stagger, no spotlight grid, wrong emphasis). Rewrote it definitively.
+- Headline emphasis: "Focus is your" now text-white/20 (very dim, recedes into black); "unfair advantage." now font-bold + full white with a stronger text-shadow glow (0 0 48px rgba(255,255,255,0.22)). Max contrast.
+- Grid: reduced from 0.045 to 0.022 opacity, increased cell size 56px→64px. Now barely visible — subtle texture, not a loud pattern. Also darkened the global .bg-grid utility (0.025→0.018) for site-wide consistency.
+- Scroll improvements: added contentY parallax (whole content drifts up -40px on scroll), bgOpacity fade (background dims to 0.3 as you scroll), smoother card parallax (cardY 80, scale 0.92, opacity fades by 0.7 scroll progress). Feels layered and premium.
+- Typography/spacing: increased top padding (pt-32/36/44), increased gap between eyebrow and headline (mt-8), headline and subhead (mt-8), subhead and CTAs (mt-10), CTAs and card (mt-20). More breathing room, Apple-like whitespace.
+- Animations: word-by-word stagger reveal (blur+rise), dim words use wordDim variant, bright "unfair advantage" uses wordBright variant with longer blur. Shimmer sweep repeats every ~7.6s. Card gentle float (6s). All calm, no bouncing.
+- Lint clean. Console clean (no errors/warnings). VLM confirmed all 6 criteria: bright bold "unfair advantage", dim receding "Focus is your", subtle barely-visible grid, soft glow, clean typography/spacing, no layout bugs. Scroll parallax verified smooth.
+
+Stage Summary:
+- Hero is polished: max-contrast headline, whisper-subtle grid, layered scroll parallax, premium spacing/typography, zero bugs.
