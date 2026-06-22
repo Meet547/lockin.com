@@ -90,3 +90,17 @@ Stage Summary:
 - Dashboard + Active Session are live, data-driven, and mutate real DB state.
 - 7-step onboarding guide walks users from download → load unpacked → first session.
 - All verified working via Agent Browser golden-path testing.
+
+---
+Task ID: 13-remove-sidebar-final
+Agent: main (orchestrator)
+Task: Remove dashboard sidebar (user reported it was back)
+
+Work Log:
+- Found the sidebar had reverted in dashboard.tsx (1 <aside> element + NAV array with 6 items: Overview/Active Session/Blocked Sites/Streak/Focus Hours/Recent Activity).
+- Rewrote dashboard.tsx completely: removed <aside>, removed NAV array, removed Wordmark/Settings/user card from sidebar, removed the mobile wordmark block.
+- Now a clean single-column: header (Dashboard / Focus Overview + Start Session button) → 3 stat cards (Today/Streak/This Week) → Active Session panel → Blocked Sites panel → Recent Activity (only if exists).
+- Verified: 0 <aside> elements, 0 NAV array, lint clean, VLM confirmed "No sidebar; clean single-column layout", no console errors.
+
+Stage Summary:
+- Dashboard sidebar permanently removed. Clean minimal single-column overview.
