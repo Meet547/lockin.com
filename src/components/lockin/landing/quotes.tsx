@@ -4,7 +4,7 @@ import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quote as QuoteIcon } from "lucide-react";
 import { Reveal, Eyebrow } from "../primitives";
-import { useLockinStore } from "@/lib/store";
+import { useDownloadExtension } from "@/lib/use-download";
 
 interface Quote {
   text: string;
@@ -71,7 +71,7 @@ const ROTATE_MS = 6000;
 export function Quotes() {
   const [index, setIndex] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
-  const { goToLandingSection } = useLockinStore();
+  const download = useDownloadExtension();
 
   React.useEffect(() => {
     if (paused) return;
@@ -189,7 +189,7 @@ export function Quotes() {
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.96 }}
-            onClick={() => goToLandingSection("onboarding")}
+            onClick={download}
             className="group relative mt-7 inline-flex items-center gap-2 overflow-hidden rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-black"
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />

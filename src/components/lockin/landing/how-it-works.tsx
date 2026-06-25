@@ -3,6 +3,7 @@
 import { Target, Lock, TrendingUp, ArrowRight } from "lucide-react";
 import { Reveal, Eyebrow } from "../primitives";
 import { useLockinStore } from "@/lib/store";
+import { useGotoOrGate } from "@/lib/use-download";
 
 const STEPS = [
   {
@@ -29,7 +30,9 @@ const STEPS = [
 ];
 
 export function HowItWorks() {
-  const { setView, goToLandingSection } = useLockinStore();
+  const setView = useLockinStore((s) => s.setView);
+  const goToLandingSection = useLockinStore((s) => s.goToLandingSection);
+  const gotoOrGate = useGotoOrGate();
 
   return (
     <section className="relative py-24 sm:py-32 lg:py-40">
@@ -74,7 +77,7 @@ export function HowItWorks() {
                         ? setView("extension")
                         : i === 1
                         ? setView("blocked")
-                        : setView("dashboard")
+                        : gotoOrGate("dashboard")
                     }
                     className="mt-7 inline-flex items-center gap-1.5 text-[13px] font-medium text-white/70 transition-colors hover:text-white"
                   >

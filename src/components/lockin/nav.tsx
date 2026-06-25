@@ -2,11 +2,17 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLockinStore, type ViewId } from "@/lib/store";
+import { useDownloadExtension, useGotoOrGate } from "@/lib/use-download";
 import { Wordmark } from "./primitives";
 
+/** Nav items where clicking should check the download gate first. */
+const GATED_VIEWS: ViewId[] = ["dashboard", "session"];
+
+/** Items that show in the nav. Extension page is always accessible (it's
+ * the install guide). Landing is reached via the wordmark. */
 const NAV_ITEMS: { label: string; view: ViewId }[] = [
   { label: "Dashboard", view: "dashboard" },
   { label: "Session", view: "session" },
@@ -14,7 +20,10 @@ const NAV_ITEMS: { label: string; view: ViewId }[] = [
 ];
 
 export function NavBar() {
-  const { view, setView, goToLandingSection } = useLockinStore();
+  const view = useLockinStore((s) => s.view);
+  const setView = useLockinStore((s) => s.setView);
+  const gotoOrGate = useGotoOrGate();
+  const download = useDownloadExtension();
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
 
@@ -26,7 +35,16 @@ export function NavBar() {
   }, []);
 
   const handleNav = (v: ViewId) => {
-    setView(v);
+    if (GATED_VIEWS.includes(v)) {
+      gotoOrGate(v);
+    } else {
+      setView(v);
+    }
+    setOpen(false);
+  };
+
+  const handleGetExtension = () => {
+    download();
     setOpen(false);
   };
 
@@ -61,9 +79,7 @@ export function NavBar() {
                 onClick={() => handleNav(item.view)}
                 className={cn(
                   "relative rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors",
-                  active
-                    ? "text-white"
-                    : "text-white/55 hover:text-white/90"
+                  active ? "text-white" : "text-white/55 hover:text-white/90"
                 )}
               >
                 {active && (
@@ -85,9 +101,10 @@ export function NavBar() {
 
         <div className="hidden md:block">
           <button
-            onClick={() => goToLandingSection("onboarding")}
-            className="rounded-full bg-white px-4 py-1.5 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95"
+            onClick={handleGetExtension}
+            className="group inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95"
           >
+            <Download className="h-3.5 w-3.5" />
             Get Extension
           </button>
         </div>
@@ -128,12 +145,10 @@ export function NavBar() {
                 </button>
               ))}
               <button
-                onClick={() => {
-                  goToLandingSection("onboarding");
-                  setOpen(false);
-                }}
-                className="mt-1 block w-full rounded-xl bg-white px-4 py-3 text-center text-[15px] font-semibold text-black"
+                onClick={handleGetExtension}
+                className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-center text-[15px] font-semibold text-black"
               >
+                <Download className="h-4 w-4" />
                 Get Extension
               </button>
             </div>

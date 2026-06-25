@@ -157,3 +157,32 @@ End-to-end test results:
 
 Stage Summary:
 - All reverted code fixed and locked in. Security hardened (host validation, mode/duration validation, ownership checks). Extension rebuilt with 4-layer blocking. Site is clean, minimal, fully functional, no bugs.
+
+---
+Task ID: 16-gate-flow
+Agent: main (orchestrator)
+Task: Remove Watch Demo, make download buttons work, gate Dashboard/Session behind download
+
+Work Log:
+- Removed "Watch Demo" button from hero. Replaced secondary CTA with "How to install" (scrolls to onboarding). Removed unused Play import.
+- Made "Download Extension" (hero), "Get Extension" (nav + mobile drawer), "Start locking in" (quotes), "Start Locking In" (final CTA), "Download" (footer), "Download Extension" (onboarding banner + step card) ALL directly trigger the file download via a shared useDownloadExtension() hook (creates a temporary anchor, sets download attr, clicks, removes). Also marks downloaded=true in localStorage.
+- Fixed stale version text in onboarding: "v1.0.0 · 17KB" → "v1.3.0 · 19KB".
+- Added download gate: Dashboard and Session views require the extension to be downloaded first.
+  • Zustand store: added `downloaded` (persisted to localStorage), `gateOpen`, `gateTarget`, `markDownloaded`, `openGate`, `closeGate`.
+  • useGotoOrGate() hook: if downloaded → navigate; if not → open gate modal.
+  • GateModal component: polished glass modal with lock badge, "Download to continue" → download → "You're all set" → "Enter Dashboard/Session". Backdrop click + "Not now"/"Maybe later" to dismiss.
+  • Wired into nav (Dashboard/Session), footer (Dashboard/Active Session), HowItWorks (View analytics), FinalCTA (Explore the Dashboard).
+  • Extension view is NOT gated (it's the install guide).
+- Fixed import bug: gate-modal.tsx imported LockMark from lucide-react (doesn't exist) and used wrong path ../primitives. Fixed to import from ./primitives.
+- Verified end-to-end:
+  • Fresh user clicks Dashboard → gate modal "Download to continue" ✓
+  • Click Download Extension in modal → download triggers, localStorage=1, modal updates to "You're all set" ✓
+  • Click "Enter Dashboard" → navigates to Dashboard ✓
+  • After download, Dashboard/Session nav go directly (no gate) ✓
+  • "Get Extension" nav button triggers download + sets state ✓
+  • "Download Extension" hero button triggers download + sets state ✓
+  • Mobile drawer → Dashboard → gate modal works ✓
+  • No console errors ✓ | Lint clean ✓
+
+Stage Summary:
+- Watch Demo removed. All download buttons now directly trigger the .zip download. Dashboard/Session are gated behind download with a polished modal that converts "Download to continue" → "You're all set" → "Enter". State persists in localStorage so the gate only shows once. Extension page remains ungated (it's the install guide).

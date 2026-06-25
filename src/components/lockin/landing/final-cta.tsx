@@ -3,10 +3,11 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Reveal, Eyebrow, LockMark } from "../primitives";
-import { useLockinStore } from "@/lib/store";
+import { useDownloadExtension, useGotoOrGate } from "@/lib/use-download";
 
 export function FinalCTA() {
-  const { goToLandingSection, setView } = useLockinStore();
+  const download = useDownloadExtension();
+  const gotoOrGate = useGotoOrGate();
 
   return (
     <section id="download" className="relative scroll-mt-24 py-24 sm:py-32 lg:py-40">
@@ -45,14 +46,14 @@ export function FinalCTA() {
 
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <button
-                  onClick={() => goToLandingSection("download")}
+                  onClick={download}
                   className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95 sm:w-auto"
                 >
                   Start Locking In
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
                 <button
-                  onClick={() => setView("dashboard")}
+                  onClick={() => gotoOrGate("dashboard")}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-8 py-4 text-[15px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/[0.07] sm:w-auto"
                 >
                   Explore the Dashboard

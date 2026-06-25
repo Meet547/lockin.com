@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLockinStore } from "@/lib/store";
 import { NavBar } from "@/components/lockin/nav";
 import { Footer } from "@/components/lockin/footer";
+import { GateModal } from "@/components/lockin/gate-modal";
 import { Landing } from "@/components/lockin/landing";
 import { Dashboard } from "@/components/lockin/dashboard/dashboard";
 import { ActiveSession } from "@/components/lockin/session/active-session";
@@ -36,6 +37,7 @@ export default function Page() {
         </AnimatePresence>
         <Footer />
       </div>
+      <GateModal />
     </div>
   );
 }

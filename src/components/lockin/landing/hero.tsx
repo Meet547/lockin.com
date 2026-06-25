@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
-import { Play, ShieldOff, Globe } from "lucide-react";
+import { ShieldOff, Globe } from "lucide-react";
 import { useLockinStore } from "@/lib/store";
+import { useDownloadExtension } from "@/lib/use-download";
 import { LockMark } from "../primitives";
 
 /** Live-ish countdown used in the floating hero card. */
@@ -53,7 +54,8 @@ const wordBright: Variants = {
 };
 
 export function Hero() {
-  const { goToLandingSection, setView } = useLockinStore();
+  const goToLandingSection = useLockinStore((s) => s.goToLandingSection);
+  const download = useDownloadExtension();
   const seconds = useCountdown(3 * 3600 + 42 * 60 + 11);
 
   const { scrollYProgress } = useScroll({
@@ -192,7 +194,7 @@ export function Hero() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.96 }}
-            onClick={() => goToLandingSection("onboarding")}
+            onClick={download}
             className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-black sm:w-auto"
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -202,11 +204,10 @@ export function Hero() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.96 }}
-            onClick={() => setView("session")}
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/[0.08] sm:w-auto"
+            onClick={() => goToLandingSection("onboarding")}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/[0.08] sm:w-auto"
           >
-            <Play className="h-4 w-4 fill-white transition-transform group-hover:scale-110" />
-            Watch Demo
+            How to install
           </motion.button>
         </motion.div>
 

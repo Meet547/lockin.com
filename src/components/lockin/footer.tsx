@@ -3,9 +3,12 @@
 import * as React from "react";
 import { LockMark } from "./primitives";
 import { useLockinStore } from "@/lib/store";
+import { useDownloadExtension, useGotoOrGate } from "@/lib/use-download";
 
 export function Footer() {
-  const { setView, goToLandingSection } = useLockinStore();
+  const setView = useLockinStore((s) => s.setView);
+  const gotoOrGate = useGotoOrGate();
+  const download = useDownloadExtension();
 
   return (
     <footer className="mt-auto border-t border-white/[0.06] bg-black">
@@ -26,15 +29,15 @@ export function Footer() {
           <FooterCol
             title="Product"
             links={[
-              { label: "Dashboard", onClick: () => setView("dashboard") },
-              { label: "Active Session", onClick: () => setView("session") },
+              { label: "Dashboard", onClick: () => gotoOrGate("dashboard") },
+              { label: "Active Session", onClick: () => gotoOrGate("session") },
               { label: "Extension", onClick: () => setView("extension") },
             ]}
           />
           <FooterCol
             title="Get Started"
             links={[
-              { label: "Download", onClick: () => goToLandingSection("onboarding") },
+              { label: "Download", onClick: download },
               { label: "Focus Modes", onClick: () => setView("landing") },
               { label: "Overview", onClick: () => setView("landing") },
             ]}

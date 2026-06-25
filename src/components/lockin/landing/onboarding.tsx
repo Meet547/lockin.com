@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Reveal, Eyebrow, LockMark } from "../primitives";
 import { cn } from "@/lib/utils";
+import { useDownloadExtension } from "@/lib/use-download";
 
 const STEPS = [
   {
@@ -68,6 +69,7 @@ const STEPS = [
 
 export function Onboarding() {
   const [copied, setCopied] = React.useState(false);
+  const download = useDownloadExtension();
 
   const copyUrl = () => {
     navigator.clipboard?.writeText("chrome://extensions").then(() => {
@@ -107,18 +109,17 @@ export function Onboarding() {
                     LOCKIN Chrome Extension
                   </p>
                   <p className="mt-0.5 text-xs text-white/45">
-                    v1.0.0 · Manifest V3 · 17KB · Free
+                    v1.3.0 · Manifest V3 · 19KB · Free
                   </p>
                 </div>
               </div>
-              <a
-                href="/lockin-extension.zip"
-                download
+              <button
+                onClick={download}
                 className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95 sm:w-auto"
               >
                 <Download className="h-4 w-4" />
                 Download Extension
-              </a>
+              </button>
             </div>
           </div>
         </Reveal>
@@ -198,6 +199,7 @@ function StepCard({
   copied: boolean;
 }) {
   const Icon = step.icon;
+  const download = useDownloadExtension();
   return (
     <motion.div
       whileHover={{ y: -3 }}
@@ -241,14 +243,13 @@ function StepCard({
       )}
 
       {step.cta && (
-        <a
-          href="/lockin-extension.zip"
-          download
+        <button
+          onClick={download}
           className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-transform hover:scale-[1.02] active:scale-95"
         >
           <Download className="h-4 w-4" />
           {step.cta}
-        </a>
+        </button>
       )}
     </motion.div>
   );
