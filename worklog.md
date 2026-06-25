@@ -186,3 +186,24 @@ Work Log:
 
 Stage Summary:
 - Watch Demo removed. All download buttons now directly trigger the .zip download. Dashboard/Session are gated behind download with a polished modal that converts "Download to continue" → "You're all set" → "Enter". State persists in localStorage so the gate only shows once. Extension page remains ungated (it's the install guide).
+
+---
+Task ID: 17-onboarding-scroll-steps
+Agent: main (orchestrator)
+Task: Auto-scroll to onboarding after download; reduce steps from 7 to 4
+
+Work Log:
+- Updated useDownloadExtension() hook: after triggering the download + marking downloaded, now calls goToLandingSection("onboarding") which switches to landing view (if not already) and sets the scroll target.
+- Fixed Landing index.tsx: the scroll effect was keyed on consumeLandingTarget (stable function ref) so it only ran once on mount. Re-keyed on landingTarget (the actual value) so it re-fires every time a target is set — including repeated downloads while already on landing.
+- Reduced onboarding from 7 steps to 4 clean steps:
+  01. Download & unzip — "Grab the .zip and unzip it anywhere. Under 20KB, no dependencies, no account." (with Download .zip CTA)
+  02. Open browser extensions — "Go to chrome://extensions and flip on Developer mode in the top-right." (with copy-to-clipboard)
+  03. Load unpacked — "Click 'Load unpacked' and select the folder you unzipped. LOCKIN appears in your toolbar."
+  04. Pin LOCKIN — "Click the puzzle-piece icon and pin LOCKIN for one-click access. Done."
+- Merged the old "Unzip" step into step 1, merged "Enable Developer mode" into step 2. Removed the "Start your first session" step (step 7) since the popup is self-explanatory.
+- Updated heading copy: "Seven steps" → "Four steps."
+- Updated grid: lg:grid-cols-3 → lg:grid-cols-4 (4 across on desktop, 2x2 on tablet, stacked on mobile). Removed unused imports (FolderArchive, ToggleRight, Play).
+- Verified end-to-end: click "Get Extension" (nav) → download triggers + scrollY 0→3996 + onboarding section at top (96px) + downloaded=1. Click "Download Extension" (hero) → same. VLM confirmed 4 step cards in a single row. No console errors. Lint clean.
+
+Stage Summary:
+- Every download button now auto-scrolls to the onboarding/install guide. Steps reduced to 4 clean cards (Download & unzip → Open extensions → Load unpacked → Pin). Merged dev-mode into step 2 and unzip into step 1.

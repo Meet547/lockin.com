@@ -10,19 +10,21 @@ import { Onboarding } from "./onboarding";
 import { FinalCTA } from "./final-cta";
 
 export function Landing() {
+  const landingTarget = useLockinStore((s) => s.landingTarget);
   const consumeLandingTarget = useLockinStore((s) => s.consumeLandingTarget);
 
+  // React to landingTarget changes (set by goToLandingSection / download).
   React.useEffect(() => {
-    const target = consumeLandingTarget();
-    if (!target) return;
+    if (!landingTarget) return;
     const id = setTimeout(() => {
-      const el = document.getElementById(target);
+      const el = document.getElementById(landingTarget);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-    }, 120);
+      consumeLandingTarget();
+    }, 140);
     return () => clearTimeout(id);
-  }, [consumeLandingTarget]);
+  }, [landingTarget, consumeLandingTarget]);
 
   return (
     <main className="relative">

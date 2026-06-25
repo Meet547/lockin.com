@@ -4,66 +4,43 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import {
   Download,
-  FolderArchive,
   Chrome,
-  ToggleRight,
   FolderOpen,
   Pin,
-  Play,
   CheckCircle2,
   Copy,
   Check,
   ExternalLink,
 } from "lucide-react";
 import { Reveal, Eyebrow, LockMark } from "../primitives";
-import { cn } from "@/lib/utils";
 import { useDownloadExtension } from "@/lib/use-download";
 
 const STEPS = [
   {
     n: "01",
     icon: Download,
-    title: "Download the extension",
-    body: "Grab the LOCKIN extension package. It's a single .zip file, under 20KB, with no external dependencies.",
+    title: "Download & unzip",
+    body: "Grab the LOCKIN .zip and unzip it anywhere on your machine. Under 20KB, no dependencies, no account.",
     cta: "Download .zip",
-    accent: true,
   },
   {
     n: "02",
-    icon: FolderArchive,
-    title: "Unzip the folder",
-    body: "Extract lockin-extension.zip anywhere on your machine. Remember where — you'll point Chrome to it next.",
-  },
-  {
-    n: "03",
     icon: Chrome,
-    title: "Open Chrome extensions",
-    body: "In a new tab, paste chrome://extensions or use the menu: ⋮ → Extensions → Manage Extensions.",
+    title: "Open browser extensions",
+    body: "In a new tab, go to chrome://extensions (or brave://extensions) and flip on Developer mode in the top-right corner.",
     mono: "chrome://extensions",
   },
   {
-    n: "04",
-    icon: ToggleRight,
-    title: "Enable Developer mode",
-    body: "Flip the Developer mode toggle in the top-right corner of the extensions page. This reveals the 'Load unpacked' button.",
-  },
-  {
-    n: "05",
+    n: "03",
     icon: FolderOpen,
     title: "Load unpacked",
-    body: "Click 'Load unpacked' and select the folder you unzipped in step 2. The LOCKIN icon appears in your toolbar.",
+    body: "Click “Load unpacked” and select the folder you just unzipped. The LOCKIN icon appears in your toolbar.",
   },
   {
-    n: "06",
+    n: "04",
     icon: Pin,
     title: "Pin LOCKIN",
-    body: "Click the puzzle-piece icon in Chrome's toolbar and pin LOCKIN so it's always one click away.",
-  },
-  {
-    n: "07",
-    icon: Play,
-    title: "Start your first session",
-    body: "Click the LOCKIN icon. Pick Monk Mode. Choose 90 minutes. Hit Start. Welcome to deep work.",
+    body: "Click the puzzle-piece icon in your toolbar and pin LOCKIN so it's always one click away. Done.",
   },
 ];
 
@@ -89,9 +66,9 @@ export function Onboarding() {
             <span className="text-white/40">Ninety seconds.</span>
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-white/55">
-            Seven steps. No account required. By the end you'll have a working
-            focus blocker running inside Chrome — blocking the sites that drain
-            you, on your terms.
+            Four steps. No account required. By the end you&apos;ll have a working
+            focus blocker running inside your browser — blocking the sites that
+            drain you, on your terms.
           </p>
         </Reveal>
 
@@ -124,18 +101,10 @@ export function Onboarding() {
           </div>
         </Reveal>
 
-        {/* steps grid */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* steps grid — 4 across on desktop */}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((step, i) => (
-            <Reveal
-              key={step.n}
-              delay={(i % 3) * 0.06}
-              amount={0.3}
-              className={cn(
-                step.accent && "sm:col-span-2 lg:col-span-1",
-                step.n === "03" && "sm:col-span-2 lg:col-span-1"
-              )}
-            >
+            <Reveal key={step.n} delay={(i % 4) * 0.06} amount={0.3}>
               <StepCard step={step} onCopyUrl={copyUrl} copied={copied} />
             </Reveal>
           ))}
@@ -147,7 +116,7 @@ export function Onboarding() {
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-white/60" />
               <p className="text-eyebrow text-white/45">
-                Verify it's working
+                Verify it&apos;s working
               </p>
             </div>
             <ul className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -169,7 +138,11 @@ export function Onboarding() {
         </Reveal>
 
         {/* help row */}
-        <Reveal delay={0.05} className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row" amount={0.3}>
+        <Reveal
+          delay={0.05}
+          className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row"
+          amount={0.3}
+        >
           <p className="text-sm text-white/45">
             Stuck? The extension is open and inspectable — read the manifest and
             background script anytime.
