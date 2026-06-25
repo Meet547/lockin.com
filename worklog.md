@@ -207,3 +207,43 @@ Work Log:
 
 Stage Summary:
 - Every download button now auto-scrolls to the onboarding/install guide. Steps reduced to 4 clean cards (Download & unzip → Open extensions → Load unpacked → Pin). Merged dev-mode into step 2 and unzip into step 1.
+
+---
+Task ID: 18-proactive-audit
+Agent: main (orchestrator)
+Task: Proactive audit — backend, security, performance, glitches
+
+Issues found & fixed:
+
+1. PAUSE BUTTON WAS BROKEN (active-session.tsx):
+   - Dead ternary: `paused ? elapsedCalc : elapsedCalc` (same on both branches). Timer never actually paused — "Pause" was cosmetic.
+   - FIX: Added pauseAccumulated + pauseStart state. togglePause() tracks real elapsed pause time. tick() now `if (paused) return` (frozen). On resume, accumulated pause duration is subtracted so the countdown continues correctly.
+   - Verified: 01:29:36 → (4s paused) → 01:29:36 (frozen) → (3s resumed) → 01:29:33 (only ticked 3, not 7).
+
+2. STATS ROUTE OVER-FETCHED (api/stats/route.ts):
+   - 3 overlapping queries: todaySessions, weekSessions, allSessions — all subsets of the same completed sessions. Plus O(n*35) heatmap loop filtering the full array 35 times.
+   - FIX: Single query for completed sessions (take: 200 cap), indexed by day into a Map for O(1) lookup. Streak, week bars, heatmap, and recent all read from the Map. Reduced from 5 DB queries to 3, eliminated redundant fetches.
+
+3. SESSION COMPLETION NOT ATOMIC (api/sessions/[id]/route.ts):
+   - Hit distribution did N sequential db.blockedSite.update() calls OUTSIDE a transaction. If the session update failed after hits were bumped, data was inconsistent.
+   - FIX: Wrapped everything in db.$transaction(). Hit updates now use Promise.all inside the transaction. Added idempotency check: if session is already non-active, return current state without re-processing.
+
+4. NO API ERROR HANDLING (all routes):
+   - 4 of 6 routes had no try/catch. DB failures leaked stack traces in 500 responses.
+   - FIX: Every route now wraps logic in try/catch, returns `{ error: "message" }` with 500 status, logs to console. No stack trace leakage.
+
+5. NO CLIENT ERROR STATES (dashboard.tsx):
+   - If /api/stats failed, the skeleton showed forever — no way to know it failed or retry.
+   - FIX: Added `error` state. On failure: shows "Couldn't load your stats" with a "Try again" button that re-calls load().
+
+6. DOUBLE-CLICK RISKS (dashboard + session):
+   - StartSessionButton, Mark Complete, End Early, add/remove site had no busy guards — rapid clicks could create duplicate sessions or double-increment hits.
+   - FIX: Added `if (busy) return` guards + `disabled` props + "Saving…" loading state on Complete Session button. StartSessionButton now checks res.ok before reloading.
+
+Notes (acceptable trade-offs, not bugs):
+- The download gate is client-side (localStorage). A technical user could set it manually. This is fine — the gate is UX, not security. The actual protection is that the extension does the blocking, and the dashboard just shows API data.
+- Prisma schema already has proper indexes: @@index([userId, status]), @@index([userId, startedAt]), @@unique([userId, host]).
+- Host validation already rejects XSS/SQL injection (added in prior task).
+
+Stage Summary:
+- 6 real issues fixed: broken pause, over-fetching stats, non-atomic session completion, missing API error handling, missing client error states, double-click risks. All verified. Lint clean. No console errors.

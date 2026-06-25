@@ -24,7 +24,10 @@ export function ActiveSession() {
   } | null>(null);
   const [remaining, setRemaining] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
+  const [pauseAccumulated, setPauseAccumulated] = React.useState(0);
+  const [pauseStart, setPauseStart] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [ending, setEnding] = React.useState(false);
 
   const load = React.useCallback(async () => {
     try {
@@ -46,24 +49,42 @@ export function ActiveSession() {
   React.useEffect(() => {
     if (!session) return;
     const tick = () => {
-      const elapsed = paused
-        ? Math.floor((Date.now() - startedAt) / 1000)
-        : Math.floor((Date.now() - startedAt) / 1000);
+      if (paused) return; // frozen while paused
+      const elapsed = Math.floor((Date.now() - startedAt - pauseAccumulated) / 1000);
       setRemaining(Math.max(0, total - elapsed));
     };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [session, startedAt, total, paused]);
+  }, [session, startedAt, total, paused, pauseAccumulated]);
+
+  const togglePause = () => {
+    if (paused) {
+      // resuming — accumulate the paused duration
+      if (pauseStart) {
+        setPauseAccumulated((p) => p + (Date.now() - pauseStart));
+      }
+      setPauseStart(null);
+      setPaused(false);
+    } else {
+      setPauseStart(Date.now());
+      setPaused(true);
+    }
+  };
 
   const end = async (status: "completed" | "cancelled") => {
-    if (!session) return;
-    await fetch(`/api/sessions/${session.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    setView("dashboard");
+    if (!session || ending) return;
+    setEnding(true);
+    try {
+      await fetch(`/api/sessions/${session.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      setView("dashboard");
+    } catch {
+      setEnding(false);
+    }
   };
 
   const p = (n: number) => n.toString().padStart(2, "0");
@@ -197,7 +218,7 @@ export function ActiveSession() {
             {/* controls */}
             <div className="mt-10 flex items-center gap-3">
               <button
-                onClick={() => setPaused((v) => !v)}
+                onClick={togglePause}
                 className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-6 py-3 text-[13px] font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/[0.08]"
               >
                 <Pause className="h-4 w-4" />
@@ -205,10 +226,11 @@ export function ActiveSession() {
               </button>
               <button
                 onClick={() => end("completed")}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95"
+                disabled={ending}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50"
               >
                 <Square className="h-3.5 w-3.5 fill-black" />
-                Complete Session
+                {ending ? "Saving…" : "Complete Session"}
               </button>
             </div>
           </div>

@@ -37,12 +37,17 @@ export function Dashboard() {
   const setView = useLockinStore((s) => s.setView);
   const [stats, setStats] = React.useState<Stats | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(false);
 
   const load = React.useCallback(async () => {
+    setError(false);
     try {
       const res = await fetch("/api/stats", { cache: "no-store" });
+      if (!res.ok) throw new Error("bad response");
       const data = await res.json();
       setStats(data);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -68,9 +73,21 @@ export function Dashboard() {
         />
       </div>
 
-      {loading || !stats ? (
+      {loading && !stats ? (
         <DashboardSkeleton />
-      ) : (
+      ) : error && !stats ? (
+        <div className="mt-8 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-8 text-center">
+          <p className="text-sm font-medium text-white/70">
+            Couldn&apos;t load your stats.
+          </p>
+          <button
+            onClick={load}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[13px] font-semibold text-black transition-transform hover:scale-[1.03] active:scale-95"
+          >
+            Try again
+          </button>
+        </div>
+      ) : stats ? (
         <>
           {/* stat row */}
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -122,7 +139,7 @@ export function Dashboard() {
             </div>
           )}
         </>
-      )}
+      ) : null}
     </main>
   );
 }
@@ -146,14 +163,18 @@ function StartSessionButton({
 }) {
   const [busy, setBusy] = React.useState(false);
   const start = async () => {
+    if (busy) return;
     setBusy(true);
     try {
-      await fetch("/api/sessions", {
+      const res = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "monk", durationMin: 90 }),
       });
+      if (!res.ok) throw new Error("failed");
       await onStarted();
+    } catch {
+      // swallow — button re-enables, user can retry
     } finally {
       setBusy(false);
     }
@@ -255,7 +276,8 @@ function ActiveSessionPanel({
   const pct = total > 0 ? ((total - remaining) / total) * 100 : 0;
 
   const end = async (status: "completed" | "cancelled") => {
-    await fetch(`/api/sessions/${session!.id}`, {
+    if (!session) return;
+    await fetch(`/api/sessions/${session.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -330,22 +352,26 @@ function BlockedSitesPanel({
 
   const add = async () => {
     const host = input.trim().toLowerCase();
-    if (!host) return;
+    if (!host || busy) return;
     setBusy(true);
     try {
-      await fetch("/api/blocklist", {
+      const res = await fetch("/api/blocklist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ host }),
       });
+      if (!res.ok) throw new Error("failed");
       setInput("");
       onChanged();
+    } catch {
+      // swallow
     } finally {
       setBusy(false);
     }
   };
 
   const remove = async (id: string) => {
+    if (busy) return;
     setBusy(true);
     try {
       await fetch(`/api/blocklist/${id}`, { method: "DELETE" });
